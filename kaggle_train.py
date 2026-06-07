@@ -184,7 +184,11 @@ def main():
     
     if os.path.exists(Config.checkpoint_path):
         print("Loading existing checkpoint...")
-        model.load_state_dict(torch.load(Config.checkpoint_path, map_location=Config.device))
+        try:
+            loaded_weights = torch.load(Config.checkpoint_path, map_location=Config.device, weights_only=False)
+        except TypeError:
+            loaded_weights = torch.load(Config.checkpoint_path, map_location=Config.device)
+        model.load_state_dict(loaded_weights)
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=Config.learning_rate)
     scaler = torch.amp.GradScaler('cuda')

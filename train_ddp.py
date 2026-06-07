@@ -81,7 +81,10 @@ def train():
     if os.path.exists(conf.checkpoint_path):
         if master_process:
             print(f"Loading checkpoint from {conf.checkpoint_path}...")
-        checkpoint = torch.load(conf.checkpoint_path, map_location=device)
+        try:
+            checkpoint = torch.load(conf.checkpoint_path, map_location=device, weights_only=False)
+        except TypeError:
+            checkpoint = torch.load(conf.checkpoint_path, map_location=device)
         raw_model = model.module if ddp else model
         raw_model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
